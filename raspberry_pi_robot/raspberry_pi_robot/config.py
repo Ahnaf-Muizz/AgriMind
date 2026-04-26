@@ -20,6 +20,8 @@ MOTOR_IN4_PIN = 27
 PWM_FREQUENCY = 1000
 # Set to False if ENA/ENB are not wired to Pi GPIO and L298N jumpers are used.
 MOTOR_PWM_ENABLED = False
+# Set to False to ignore ENA/ENB pins completely (direction pins only).
+MOTOR_USE_ENABLE_PINS = False
 
 # Motor tuning (0 to 100)
 LEFT_MOTOR_BASE_SPEED = 55

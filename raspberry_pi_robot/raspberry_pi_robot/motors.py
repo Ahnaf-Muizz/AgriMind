@@ -10,22 +10,25 @@ class MotorController:
         GPIO.setmode(GPIO.BCM)
         GPIO.setwarnings(False)
         self.use_pwm = bool(getattr(config, "MOTOR_PWM_ENABLED", True))
+        self.use_enable_pins = bool(getattr(config, "MOTOR_USE_ENABLE_PINS", True))
 
         GPIO.setup(config.MOTOR_IN1_PIN, GPIO.OUT)
         GPIO.setup(config.MOTOR_IN2_PIN, GPIO.OUT)
         GPIO.setup(config.MOTOR_IN3_PIN, GPIO.OUT)
         GPIO.setup(config.MOTOR_IN4_PIN, GPIO.OUT)
-        GPIO.setup(config.MOTOR_ENA_PIN, GPIO.OUT)
-        GPIO.setup(config.MOTOR_ENB_PIN, GPIO.OUT)
         self.pwm_left = None
         self.pwm_right = None
 
-        if self.use_pwm:
+        if self.use_enable_pins:
+            GPIO.setup(config.MOTOR_ENA_PIN, GPIO.OUT)
+            GPIO.setup(config.MOTOR_ENB_PIN, GPIO.OUT)
+
+        if self.use_pwm and self.use_enable_pins:
             self.pwm_left = GPIO.PWM(config.MOTOR_ENA_PIN, config.PWM_FREQUENCY)
             self.pwm_right = GPIO.PWM(config.MOTOR_ENB_PIN, config.PWM_FREQUENCY)
             self.pwm_left.start(0)
             self.pwm_right.start(0)
-        else:
+        elif self.use_enable_pins:
             GPIO.output(config.MOTOR_ENA_PIN, GPIO.LOW)
             GPIO.output(config.MOTOR_ENB_PIN, GPIO.LOW)
 
@@ -36,6 +39,8 @@ class MotorController:
     def set_speed(self, left_speed: float, right_speed: float) -> None:
         left = self._clamp_speed(left_speed + config.LEFT_MOTOR_TRIM)
         right = self._clamp_speed(right_speed + config.RIGHT_MOTOR_TRIM)
+        if not self.use_enable_pins:
+            return
         if not self.use_pwm:
             GPIO.output(config.MOTOR_ENA_PIN, GPIO.HIGH if left > 0 else GPIO.LOW)
             GPIO.output(config.MOTOR_ENB_PIN, GPIO.HIGH if right > 0 else GPIO.LOW)
