@@ -29,8 +29,21 @@ class MotorController:
     def set_speed(self, left_speed: float, right_speed: float) -> None:
         left = self._clamp_speed(left_speed + config.LEFT_MOTOR_TRIM)
         right = self._clamp_speed(right_speed + config.RIGHT_MOTOR_TRIM)
+        min_duty = max(0.0, min(100.0, float(getattr(config, "MOTOR_MIN_EFFECTIVE_DUTY", 0))))
+        if 0.0 < left < min_duty:
+            left = min_duty
+        if 0.0 < right < min_duty:
+            right = min_duty
         self.pwm_left.ChangeDutyCycle(left)
         self.pwm_right.ChangeDutyCycle(right)
+
+    def _startup_boost(self, left_speed: float, right_speed: float) -> None:
+        boost_seconds = float(getattr(config, "MOTOR_START_BOOST_SECONDS", 0.0))
+        boost_duty = self._clamp_speed(float(getattr(config, "MOTOR_START_BOOST_DUTY", 100.0)))
+        if boost_seconds <= 0.0:
+            return
+        self.set_speed(max(left_speed, boost_duty), max(right_speed, boost_duty))
+        time.sleep(boost_seconds)
 
     def forward(self, speed_left=None, speed_right=None) -> None:
         speed_left = speed_left if speed_left is not None else config.LEFT_MOTOR_BASE_SPEED
@@ -39,6 +52,7 @@ class MotorController:
         GPIO.output(config.MOTOR_IN2_PIN, GPIO.LOW)
         GPIO.output(config.MOTOR_IN3_PIN, GPIO.HIGH)
         GPIO.output(config.MOTOR_IN4_PIN, GPIO.LOW)
+        self._startup_boost(speed_left, speed_right)
         self.set_speed(speed_left, speed_right)
 
     def backward(self, speed_left=None, speed_right=None) -> None:
@@ -48,6 +62,7 @@ class MotorController:
         GPIO.output(config.MOTOR_IN2_PIN, GPIO.HIGH)
         GPIO.output(config.MOTOR_IN3_PIN, GPIO.LOW)
         GPIO.output(config.MOTOR_IN4_PIN, GPIO.HIGH)
+        self._startup_boost(speed_left, speed_right)
         self.set_speed(speed_left, speed_right)
 
     def turn_left(self, speed=45) -> None:
@@ -55,6 +70,7 @@ class MotorController:
         GPIO.output(config.MOTOR_IN2_PIN, GPIO.HIGH)
         GPIO.output(config.MOTOR_IN3_PIN, GPIO.HIGH)
         GPIO.output(config.MOTOR_IN4_PIN, GPIO.LOW)
+        self._startup_boost(speed, speed)
         self.set_speed(speed, speed)
 
     def turn_right(self, speed=45) -> None:
@@ -62,6 +78,7 @@ class MotorController:
         GPIO.output(config.MOTOR_IN2_PIN, GPIO.LOW)
         GPIO.output(config.MOTOR_IN3_PIN, GPIO.LOW)
         GPIO.output(config.MOTOR_IN4_PIN, GPIO.HIGH)
+        self._startup_boost(speed, speed)
         self.set_speed(speed, speed)
 
     def stop(self) -> None:

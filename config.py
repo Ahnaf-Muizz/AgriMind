@@ -26,6 +26,12 @@ RIGHT_MOTOR_BASE_SPEED = 55
 # Adjust to compensate mechanical mismatch between motors.
 LEFT_MOTOR_TRIM = 0
 RIGHT_MOTOR_TRIM = 0
+# Many TT motors will not start reliably below this duty cycle.
+# Keep at 0 to disable this behavior.
+MOTOR_MIN_EFFECTIVE_DUTY = 65
+# Briefly apply a stronger duty to break static friction at startup.
+MOTOR_START_BOOST_DUTY = 90
+MOTOR_START_BOOST_SECONDS = 0.12
 
 # -----------------------------
 # Grove sensor channels
