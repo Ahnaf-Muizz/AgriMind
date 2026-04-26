@@ -4,26 +4,18 @@ from datetime import datetime
 
 import config
 from camera import CameraCapture
-from motors import MotorController
 from sensors import SensorSuite
 from uploader import SupercomputerUploader
 
 
 def print_help() -> None:
     print("\nCommands:")
-    print("  f  -> move forward")
-    print("  b  -> move backward")
-    print("  l  -> turn left")
-    print("  r  -> turn right")
-    print("  s  -> stop")
     print("  c  -> capture image")
     print("  u  -> capture + upload to supercomputer")
-    print("  d  -> demo motion")
     print("  q  -> quit")
 
 
 def main() -> None:
-    motors = MotorController()
     sensors = SensorSuite()
     camera = None
     try:
@@ -53,18 +45,8 @@ def main() -> None:
                     except Exception as exc:
                         print(f"Upload failed: {exc}")
 
-            cmd = input("Enter command (f/b/l/r/s/c/u/d/q or Enter to continue): ").strip().lower()
-            if cmd == "f":
-                motors.forward()
-            elif cmd == "b":
-                motors.backward()
-            elif cmd == "l":
-                motors.turn_left()
-            elif cmd == "r":
-                motors.turn_right()
-            elif cmd == "s":
-                motors.stop()
-            elif cmd == "c":
+            cmd = input("Enter command (c/u/q or Enter to continue): ").strip().lower()
+            if cmd == "c":
                 if camera is None:
                     print("Capture skipped: camera not available.")
                 else:
@@ -81,8 +63,6 @@ def main() -> None:
                         print("Upload response:", json.dumps(result))
                     except Exception as exc:
                         print(f"Upload failed: {exc}")
-            elif cmd == "d":
-                motors.demo_motion()
             elif cmd == "q":
                 break
 
@@ -90,7 +70,6 @@ def main() -> None:
     except KeyboardInterrupt:
         print("\nStopping robot...")
     finally:
-        motors.cleanup()
         if camera is not None:
             camera.close()
         print("Clean shutdown done.")

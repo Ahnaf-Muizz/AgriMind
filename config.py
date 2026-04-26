@@ -119,8 +119,11 @@ AUTO_CAPTURE_EVERY_N_LOOPS = 10
 # Supercomputer upload settings
 # -----------------------------
 UPLOAD_ENABLED = True
-SUPERCOMPUTER_ANALYZE_UPLOAD_URL = "http://127.0.0.1:8000/analyze_upload"
+SUPERCOMPUTER_ANALYZE_UPLOAD_URL = "http://<SUPERCOMPUTER_IP>:8000/analyze_upload"
 DEVICE_ID = "pi-robot-01"
-CROP_TYPE = "apple"
+# Demo presets:
+# - Diseased sample flow: use tomato images -> set CROP_TYPE = "tomato"
+# - Healthy sample flow: use corn images -> set CROP_TYPE = "corn"
+CROP_TYPE = "tomato"
 GPS_OR_ROW_ID = "row-7"
 UPLOAD_TIMEOUT_SECONDS = 45
