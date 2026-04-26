@@ -26,15 +26,19 @@ class SenseCAPIndicator:
             ports = (single_port,) if single_port else ()
 
         for port in ports:
+            candidate_ser = None
             try:
-                self.ser = serial.Serial(
+                candidate_ser = serial.Serial(
                     port,
                     config.SENSECAP_BAUDRATE,
                     timeout=1,
                 )
                 print(f"SenseCAP connected on {port}")
+                self.ser = candidate_ser
                 break
             except Exception:
+                if candidate_ser is not None and candidate_ser.is_open:
+                    candidate_ser.close()
                 continue
 
         if self.ser is None:
