@@ -10,18 +10,14 @@ Edit this file for pin changes, calibration, and tuning.
 # ENB, IN3, IN4 => right motor
 # -----------------------------
 MOTOR_ENA_PIN = 18
-MOTOR_IN1_PIN = 22
-MOTOR_IN2_PIN = 23
+MOTOR_IN1_PIN = 17
+MOTOR_IN2_PIN = 27
 
 MOTOR_ENB_PIN = 13
-MOTOR_IN3_PIN = 24
-MOTOR_IN4_PIN = 27
+MOTOR_IN3_PIN = 23
+MOTOR_IN4_PIN = 24
 
 PWM_FREQUENCY = 1000
-# Set to False if ENA/ENB are not wired to Pi GPIO and L298N jumpers are used.
-MOTOR_PWM_ENABLED = False
-# Set to False to ignore ENA/ENB pins completely (direction pins only).
-MOTOR_USE_ENABLE_PINS = False
 
 # Motor tuning (0 to 100)
 LEFT_MOTOR_BASE_SPEED = 55
