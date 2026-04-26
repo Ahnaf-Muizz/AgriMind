@@ -8,6 +8,17 @@ import config
 
 
 class CameraCapture:
+    @staticmethod
+    def _apply_focus_controls(cap: cv2.VideoCapture) -> None:
+        auto_focus = bool(getattr(config, "CAMERA_AUTOFOCUS", False))
+        focus_absolute = int(getattr(config, "CAMERA_FOCUS_ABSOLUTE", 30))
+
+        # Disable autofocus for stable close-up leaf shots.
+        # Ignore failures because not all UVC drivers expose these controls.
+        cap.set(cv2.CAP_PROP_AUTOFOCUS, 1.0 if auto_focus else 0.0)
+        if not auto_focus:
+            cap.set(cv2.CAP_PROP_FOCUS, float(focus_absolute))
+
     def __init__(self) -> None:
         self.out_dir = Path(config.CAPTURE_DIR)
         self.out_dir.mkdir(parents=True, exist_ok=True)
@@ -29,6 +40,7 @@ class CameraCapture:
                         continue
                     cap.set(cv2.CAP_PROP_FRAME_WIDTH, config.CAPTURE_WIDTH)
                     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, config.CAPTURE_HEIGHT)
+                    self._apply_focus_controls(cap)
                     ok, _ = cap.read()
                     if ok:
                         self.capture = cap

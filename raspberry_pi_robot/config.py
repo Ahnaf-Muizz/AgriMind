@@ -92,6 +92,11 @@ CAPTURE_DIR = "captures"
 CAMERA_WARMUP_FRAMES = 10
 CAMERA_OPEN_RETRIES = 2
 CAMERA_READ_RETRIES = 3
+# Focus tuning for close-range leaf captures.
+# Set to False to disable autofocus hunting in the background.
+CAMERA_AUTOFOCUS = False
+# Typical useful range is 0-255. Lower values focus closer.
+CAMERA_FOCUS_ABSOLUTE = 30
 
 # -----------------------------
 # SenseCAP Indicator (optional)
