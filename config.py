@@ -96,6 +96,8 @@ SENSECAP_SERIAL_TIMEOUT_SECONDS = 1.0
 SENSECAP_SERIAL_WRITE_TIMEOUT_SECONDS = 1.0
 # If send fails, retry by reconnecting after this many seconds.
 SENSECAP_RECONNECT_COOLDOWN_SECONDS = 2.0
+# Use compact payload by default for easier Indicator-side parsing.
+SENSECAP_SIMPLE_PAYLOAD = True
 
 # -----------------------------
 # App behavior

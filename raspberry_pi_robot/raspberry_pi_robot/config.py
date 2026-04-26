@@ -86,6 +86,7 @@ SENSECAP_SERIAL_PORTS = (
     "/dev/ttyS0",
 )
 SENSECAP_BAUDRATE = 115200
+SENSECAP_SIMPLE_PAYLOAD = True
 
 # -----------------------------
 # App behavior

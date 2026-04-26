@@ -60,11 +60,19 @@ class SenseCAPIndicator:
     def send_status(self, payload: dict) -> None:
         if not self.enabled:
             return
-        message = {
-            "ts": datetime.now().isoformat(),
-            "type": "robot_status",
-            "data": payload,
-        }
+        if getattr(config, "SENSECAP_SIMPLE_PAYLOAD", False):
+            message = {
+                "t": payload.get("temperature_c"),
+                "m": payload.get("moisture_pct"),
+                "aq": payload.get("air_quality_index"),
+                "l": payload.get("light_lux_est"),
+            }
+        else:
+            message = {
+                "ts": datetime.now().isoformat(),
+                "type": "robot_status",
+                "data": payload,
+            }
         line = json.dumps(message) + "\n"
         if self.ser is None:
             cooldown = float(getattr(config, "SENSECAP_RECONNECT_COOLDOWN_SECONDS", 2.0))
