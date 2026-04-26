@@ -15,26 +15,31 @@ class MotorController:
         GPIO.setup(config.MOTOR_IN2_PIN, GPIO.OUT)
         GPIO.setup(config.MOTOR_IN3_PIN, GPIO.OUT)
         GPIO.setup(config.MOTOR_IN4_PIN, GPIO.OUT)
+        GPIO.setup(config.MOTOR_ENA_PIN, GPIO.OUT)
+        GPIO.setup(config.MOTOR_ENB_PIN, GPIO.OUT)
         self.pwm_left = None
         self.pwm_right = None
 
         if self.use_pwm:
-            GPIO.setup(config.MOTOR_ENA_PIN, GPIO.OUT)
-            GPIO.setup(config.MOTOR_ENB_PIN, GPIO.OUT)
             self.pwm_left = GPIO.PWM(config.MOTOR_ENA_PIN, config.PWM_FREQUENCY)
             self.pwm_right = GPIO.PWM(config.MOTOR_ENB_PIN, config.PWM_FREQUENCY)
             self.pwm_left.start(0)
             self.pwm_right.start(0)
+        else:
+            GPIO.output(config.MOTOR_ENA_PIN, GPIO.LOW)
+            GPIO.output(config.MOTOR_ENB_PIN, GPIO.LOW)
 
     @staticmethod
     def _clamp_speed(speed: float) -> float:
         return max(0.0, min(100.0, speed))
 
     def set_speed(self, left_speed: float, right_speed: float) -> None:
-        if not self.use_pwm:
-            return
         left = self._clamp_speed(left_speed + config.LEFT_MOTOR_TRIM)
         right = self._clamp_speed(right_speed + config.RIGHT_MOTOR_TRIM)
+        if not self.use_pwm:
+            GPIO.output(config.MOTOR_ENA_PIN, GPIO.HIGH if left > 0 else GPIO.LOW)
+            GPIO.output(config.MOTOR_ENB_PIN, GPIO.HIGH if right > 0 else GPIO.LOW)
+            return
         self.pwm_left.ChangeDutyCycle(left)
         self.pwm_right.ChangeDutyCycle(right)
 
