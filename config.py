@@ -102,3 +102,13 @@ SENSECAP_RECONNECT_COOLDOWN_SECONDS = 2.0
 # -----------------------------
 LOOP_INTERVAL_SECONDS = 2.0
 AUTO_CAPTURE_EVERY_N_LOOPS = 10
+
+# -----------------------------
+# Supercomputer upload settings
+# -----------------------------
+UPLOAD_ENABLED = True
+SUPERCOMPUTER_ANALYZE_UPLOAD_URL = "http://127.0.0.1:8000/analyze_upload"
+DEVICE_ID = "pi-robot-01"
+CROP_TYPE = "apple"
+GPS_OR_ROW_ID = "row-7"
+UPLOAD_TIMEOUT_SECONDS = 45

@@ -16,6 +16,7 @@ Designed for beginner-friendly IDEs such as Thonny or Geany.
 - `sensors.py`: sensor read + calibration logic
 - `camera.py`: Logitech camera capture helpers
 - `sensecap_indicator.py`: optional serial messaging
+- `uploader.py`: sends sensor + image payload to supercomputer API
 - `main.py`: run loop and demo behavior
 - `pinout.txt`: wiring map for your hardware
 
@@ -24,7 +25,7 @@ Designed for beginner-friendly IDEs such as Thonny or Geany.
 ```bash
 sudo apt update
 sudo apt install -y python3-pip python3-opencv
-pip3 install RPi.GPIO pyserial
+pip3 install RPi.GPIO pyserial requests
 ```
 
 Optional for Grove Base HAT:
@@ -40,3 +41,14 @@ python3 main.py
 ```
 
 Edit values in `config.py` to calibrate sensors and motor behavior.
+
+## Send Data to Supercomputer
+
+1. On supercomputer, run API:
+   - `uvicorn agrimind.api:app --host 0.0.0.0 --port 8000`
+2. On Pi, set in `config.py`:
+   - `SUPERCOMPUTER_ANALYZE_UPLOAD_URL` to supercomputer IP (for example `http://192.168.1.50:8000/analyze_upload`)
+   - `UPLOAD_ENABLED = True`
+3. In `main.py`:
+   - Auto-upload runs every `AUTO_CAPTURE_EVERY_N_LOOPS`
+   - Manual upload command: `u`

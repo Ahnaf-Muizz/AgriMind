@@ -7,6 +7,7 @@ from camera import CameraCapture
 from motors import MotorController
 from sensecap_indicator import SenseCAPIndicator
 from sensors import SensorSuite
+from uploader import SupercomputerUploader
 
 
 def print_help() -> None:
@@ -17,6 +18,7 @@ def print_help() -> None:
     print("  r  -> turn right")
     print("  s  -> stop")
     print("  c  -> capture image")
+    print("  u  -> capture + upload to supercomputer")
     print("  d  -> demo motion")
     print("  q  -> quit")
 
@@ -30,6 +32,7 @@ def main() -> None:
     except RuntimeError as exc:
         print(f"Camera disabled: {exc}")
     indicator = SenseCAPIndicator()
+    uploader = SupercomputerUploader()
 
     loop_count = 0
     print("Robot controller started.")
@@ -46,8 +49,14 @@ def main() -> None:
             if camera is not None and loop_count % config.AUTO_CAPTURE_EVERY_N_LOOPS == 0:
                 img_path = camera.snap(prefix="auto")
                 print(f"Auto capture saved: {img_path}")
+                if config.UPLOAD_ENABLED:
+                    try:
+                        result = uploader.send_capture(img_path, sensor_data)
+                        print("Upload response:", json.dumps(result))
+                    except Exception as exc:
+                        print(f"Upload failed: {exc}")
 
-            cmd = input("Enter command (f/b/l/r/s/c/d/q or Enter to continue): ").strip().lower()
+            cmd = input("Enter command (f/b/l/r/s/c/u/d/q or Enter to continue): ").strip().lower()
             if cmd == "f":
                 motors.forward()
             elif cmd == "b":
@@ -64,6 +73,17 @@ def main() -> None:
                 else:
                     img_path = camera.snap(prefix="manual")
                     print(f"Manual capture saved: {img_path}")
+            elif cmd == "u":
+                if camera is None:
+                    print("Upload skipped: camera not available.")
+                else:
+                    img_path = camera.snap(prefix="upload")
+                    print(f"Upload capture saved: {img_path}")
+                    try:
+                        result = uploader.send_capture(img_path, sensor_data)
+                        print("Upload response:", json.dumps(result))
+                    except Exception as exc:
+                        print(f"Upload failed: {exc}")
             elif cmd == "d":
                 motors.demo_motion()
             elif cmd == "q":
