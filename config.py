@@ -83,13 +83,13 @@ CAPTURE_DIR = "captures"
 # SenseCAP Indicator (optional)
 # -----------------------------
 SENSECAP_ENABLED = True
-# Serial ports tried in order. For GPIO UART, prefer /dev/serial0.
+# Serial ports tried in order. Prefer USB first for SenseCAP Indicator.
 SENSECAP_SERIAL_PORTS = (
+    "/dev/ttyACM0",
+    "/dev/ttyUSB0",
     "/dev/serial0",
     "/dev/ttyAMA0",
     "/dev/ttyS0",
-    "/dev/ttyACM0",
-    "/dev/ttyUSB0",
 )
 SENSECAP_BAUDRATE = 115200
 SENSECAP_SERIAL_TIMEOUT_SECONDS = 1.0
