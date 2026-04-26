@@ -1,5 +1,6 @@
 from datetime import datetime
 from pathlib import Path
+import subprocess
 import time
 
 import cv2
@@ -9,9 +10,39 @@ import config
 
 class CameraCapture:
     @staticmethod
-    def _apply_focus_controls(cap: cv2.VideoCapture) -> None:
+    def _force_v4l2_focus(index: int, auto_focus: bool, focus_absolute: int) -> None:
+        device = f"/dev/video{index}"
+        # Force focus mode at the V4L2 driver level so autofocus does not re-enable.
+        try:
+            if auto_focus:
+                subprocess.run(
+                    ["v4l2-ctl", "-d", device, "-c", "focus_automatic_continuous=1"],
+                    check=False,
+                    capture_output=True,
+                    text=True,
+                )
+            else:
+                subprocess.run(
+                    ["v4l2-ctl", "-d", device, "-c", "focus_automatic_continuous=0"],
+                    check=False,
+                    capture_output=True,
+                    text=True,
+                )
+                subprocess.run(
+                    ["v4l2-ctl", "-d", device, "-c", f"focus_absolute={focus_absolute}"],
+                    check=False,
+                    capture_output=True,
+                    text=True,
+                )
+        except Exception:
+            # Ignore if v4l2-ctl is unavailable; OpenCV focus controls remain as fallback.
+            pass
+
+    @staticmethod
+    def _apply_focus_controls(cap: cv2.VideoCapture, index: int) -> None:
         auto_focus = bool(getattr(config, "CAMERA_AUTOFOCUS", False))
         focus_absolute = int(getattr(config, "CAMERA_FOCUS_ABSOLUTE", 30))
+        CameraCapture._force_v4l2_focus(index=index, auto_focus=auto_focus, focus_absolute=focus_absolute)
 
         # Disable autofocus for stable close-up leaf shots.
         # Ignore failures because not all UVC drivers expose these controls.
@@ -40,7 +71,7 @@ class CameraCapture:
                         continue
                     cap.set(cv2.CAP_PROP_FRAME_WIDTH, config.CAPTURE_WIDTH)
                     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, config.CAPTURE_HEIGHT)
-                    self._apply_focus_controls(cap)
+                    self._apply_focus_controls(cap, index=index)
                     ok, _ = cap.read()
                     if ok:
                         self.capture = cap
