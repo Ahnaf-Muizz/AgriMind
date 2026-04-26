@@ -9,24 +9,30 @@ class MotorController:
     def __init__(self) -> None:
         GPIO.setmode(GPIO.BCM)
         GPIO.setwarnings(False)
+        self.use_pwm = bool(getattr(config, "MOTOR_PWM_ENABLED", True))
 
         GPIO.setup(config.MOTOR_IN1_PIN, GPIO.OUT)
         GPIO.setup(config.MOTOR_IN2_PIN, GPIO.OUT)
         GPIO.setup(config.MOTOR_IN3_PIN, GPIO.OUT)
         GPIO.setup(config.MOTOR_IN4_PIN, GPIO.OUT)
-        GPIO.setup(config.MOTOR_ENA_PIN, GPIO.OUT)
-        GPIO.setup(config.MOTOR_ENB_PIN, GPIO.OUT)
+        self.pwm_left = None
+        self.pwm_right = None
 
-        self.pwm_left = GPIO.PWM(config.MOTOR_ENA_PIN, config.PWM_FREQUENCY)
-        self.pwm_right = GPIO.PWM(config.MOTOR_ENB_PIN, config.PWM_FREQUENCY)
-        self.pwm_left.start(0)
-        self.pwm_right.start(0)
+        if self.use_pwm:
+            GPIO.setup(config.MOTOR_ENA_PIN, GPIO.OUT)
+            GPIO.setup(config.MOTOR_ENB_PIN, GPIO.OUT)
+            self.pwm_left = GPIO.PWM(config.MOTOR_ENA_PIN, config.PWM_FREQUENCY)
+            self.pwm_right = GPIO.PWM(config.MOTOR_ENB_PIN, config.PWM_FREQUENCY)
+            self.pwm_left.start(0)
+            self.pwm_right.start(0)
 
     @staticmethod
     def _clamp_speed(speed: float) -> float:
         return max(0.0, min(100.0, speed))
 
     def set_speed(self, left_speed: float, right_speed: float) -> None:
+        if not self.use_pwm:
+            return
         left = self._clamp_speed(left_speed + config.LEFT_MOTOR_TRIM)
         right = self._clamp_speed(right_speed + config.RIGHT_MOTOR_TRIM)
         min_duty = max(0.0, min(100.0, float(getattr(config, "MOTOR_MIN_EFFECTIVE_DUTY", 0))))
@@ -38,6 +44,8 @@ class MotorController:
         self.pwm_right.ChangeDutyCycle(right)
 
     def _startup_boost(self, left_speed: float, right_speed: float) -> None:
+        if not self.use_pwm:
+            return
         boost_seconds = float(getattr(config, "MOTOR_START_BOOST_SECONDS", 0.0))
         boost_duty = self._clamp_speed(float(getattr(config, "MOTOR_START_BOOST_DUTY", 100.0)))
         if boost_seconds <= 0.0:
@@ -101,6 +109,8 @@ class MotorController:
 
     def cleanup(self) -> None:
         self.stop()
-        self.pwm_left.stop()
-        self.pwm_right.stop()
+        if self.pwm_left is not None:
+            self.pwm_left.stop()
+        if self.pwm_right is not None:
+            self.pwm_right.stop()
         GPIO.cleanup()
