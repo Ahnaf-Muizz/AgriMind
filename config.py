@@ -74,6 +74,16 @@ AIR_RAW_POLLUTED = 700.0
 AIR_QUALITY_OFFSET = 0.0
 
 # -----------------------------
+# Demo sensor overrides
+# -----------------------------
+# Set these to True for hackathon demos when sensors are unstable.
+USE_DEMO_MOISTURE_VALUE = True
+DEMO_MOISTURE_PCT = 34.0
+
+USE_DEMO_AIR_QUALITY_VALUE = True
+DEMO_AIR_QUALITY_INDEX = 78.0
+
+# -----------------------------
 # Camera
 # -----------------------------
 CAMERA_INDEX = 0

@@ -41,6 +41,8 @@ class SensorSuite:
         return temperature_c
 
     def read_moisture_pct(self) -> float:
+        if getattr(config, "USE_DEMO_MOISTURE_VALUE", False):
+            return _clamp(float(getattr(config, "DEMO_MOISTURE_PCT", 34.0)), 0.0, 100.0)
         raw = self.read_raw(config.MOISTURE_CHANNEL)
         dry = config.MOISTURE_RAW_DRY
         wet = config.MOISTURE_RAW_WET
@@ -50,6 +52,8 @@ class SensorSuite:
         return _clamp(pct, 0.0, 100.0)
 
     def read_air_quality_index(self) -> float:
+        if getattr(config, "USE_DEMO_AIR_QUALITY_VALUE", False):
+            return _clamp(float(getattr(config, "DEMO_AIR_QUALITY_INDEX", 78.0)), 0.0, 500.0)
         raw = self.read_raw(config.AIR_QUALITY_CHANNEL)
         clean = config.AIR_RAW_CLEAN
         polluted = config.AIR_RAW_POLLUTED
