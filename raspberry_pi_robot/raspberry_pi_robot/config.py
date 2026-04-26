@@ -67,6 +67,8 @@ AIR_QUALITY_OFFSET = 0.0
 # Camera
 # -----------------------------
 CAMERA_INDEX = 0
+# If CAMERA_INDEX fails, try these indices in order.
+CAMERA_INDEX_FALLBACKS = (1, 2, 3, 4, 5)
 CAPTURE_WIDTH = 1280
 CAPTURE_HEIGHT = 720
 CAPTURE_DIR = "captures"

@@ -24,7 +24,11 @@ def print_help() -> None:
 def main() -> None:
     motors = MotorController()
     sensors = SensorSuite()
-    camera = CameraCapture()
+    camera = None
+    try:
+        camera = CameraCapture()
+    except RuntimeError as exc:
+        print(f"Camera disabled: {exc}")
     indicator = SenseCAPIndicator()
 
     loop_count = 0
@@ -39,7 +43,7 @@ def main() -> None:
             print("Sensors:", json.dumps(sensor_data))
             indicator.send_status(sensor_data)
 
-            if loop_count % config.AUTO_CAPTURE_EVERY_N_LOOPS == 0:
+            if camera is not None and loop_count % config.AUTO_CAPTURE_EVERY_N_LOOPS == 0:
                 img_path = camera.snap(prefix="auto")
                 print(f"Auto capture saved: {img_path}")
 
@@ -55,8 +59,11 @@ def main() -> None:
             elif cmd == "s":
                 motors.stop()
             elif cmd == "c":
-                img_path = camera.snap(prefix="manual")
-                print(f"Manual capture saved: {img_path}")
+                if camera is None:
+                    print("Capture skipped: camera not available.")
+                else:
+                    img_path = camera.snap(prefix="manual")
+                    print(f"Manual capture saved: {img_path}")
             elif cmd == "d":
                 motors.demo_motion()
             elif cmd == "q":
@@ -67,7 +74,8 @@ def main() -> None:
         print("\nStopping robot...")
     finally:
         motors.cleanup()
-        camera.close()
+        if camera is not None:
+            camera.close()
         indicator.close()
         print("Clean shutdown done.")
 
