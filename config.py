@@ -29,13 +29,13 @@ RIGHT_MOTOR_TRIM = 0
 
 # -----------------------------
 # Grove sensor channels
-# Using Grove Base HAT analog channels:
-# A0=0, A1=1, A2=2, A3=3
+# Using Grove analog channels:
+# A0=0, A2=2, A4=4, A6=6
 # -----------------------------
 LIGHT_CHANNEL = 0
-TEMPERATURE_CHANNEL = 1
-MOISTURE_CHANNEL = 2
-AIR_QUALITY_CHANNEL = 3
+TEMPERATURE_CHANNEL = 2
+MOISTURE_CHANNEL = 4
+AIR_QUALITY_CHANNEL = 6
 
 # -----------------------------
 # Sensor calibration

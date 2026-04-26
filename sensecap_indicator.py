@@ -54,6 +54,7 @@ class SenseCAPIndicator:
             "data": payload,
         }
         line = json.dumps(message) + "\n"
+        print("SenseCAP TX:", line.strip())
         self.ser.write(line.encode("utf-8"))
 
     def close(self) -> None:
